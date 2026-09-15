@@ -14,7 +14,10 @@ import {
   Minus,
   SlidersHorizontal,
   Grid3X3,
-  List
+  List,
+  User,
+  Building2,
+  Sparkles
 } from 'lucide-react';
 import { mockArticles, categories, regions, mockSources } from '../data/mockData';
 import { Article } from '../types';
@@ -310,6 +313,7 @@ function ArticleCard({ article, viewMode, onToggleBookmark }: { article: Article
             <span className="flex items-center gap-1 font-medium text-slate-600">
               <Tag className="w-3 h-3" /> {article.sourceName}
             </span>
+            <span className="text-xs text-slate-400">{article.readTime} мин чтения</span>
           </div>
           <div className="flex flex-wrap gap-1 mt-2">
             {article.tags.map(tag => (
@@ -317,7 +321,27 @@ function ArticleCard({ article, viewMode, onToggleBookmark }: { article: Article
                 #{tag}
               </span>
             ))}
+            {article.entities.length > 0 && (
+              <span className="flex items-center gap-0.5 text-xs bg-purple-50 text-purple-600 px-2 py-0.5 rounded-full">
+                <Sparkles className="w-3 h-3" /> {article.entities.length} NER
+              </span>
+            )}
           </div>
+          {article.entities.length > 0 && (
+            <div className="flex flex-wrap gap-1 mt-2">
+              {article.entities.slice(0, 3).map((entity, i) => (
+                <span key={i} className={`text-xs px-1.5 py-0.5 rounded border ${
+                  entity.type === 'person' ? 'bg-blue-50 border-blue-200 text-blue-700' :
+                  entity.type === 'organization' ? 'bg-amber-50 border-amber-200 text-amber-700' :
+                  entity.type === 'location' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' :
+                  entity.type === 'money' ? 'bg-green-50 border-green-200 text-green-700' :
+                  'bg-slate-50 border-slate-200 text-slate-600'
+                }`}>
+                  {entity.text}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
         <div className="flex flex-col items-end gap-2">
           <button onClick={() => onToggleBookmark(article.id)} className="p-2 hover:bg-slate-100 rounded-lg transition-colors">

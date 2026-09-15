@@ -5,6 +5,10 @@ import Feed from './pages/Feed';
 import Sources from './pages/Sources';
 import Analytics from './pages/Analytics';
 import SettingsPage from './pages/Settings';
+import Tariffs from './pages/Tariffs';
+import AIDiscovery from './pages/AIDiscovery';
+import Reports from './pages/Reports';
+import UsersPage from './pages/Users';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -15,7 +19,11 @@ export default function App() {
       case 'dashboard': return <Dashboard />;
       case 'feed': return <Feed />;
       case 'sources': return <Sources />;
+      case 'ai-discovery': return <AIDiscovery />;
       case 'analytics': return <Analytics />;
+      case 'reports': return <Reports />;
+      case 'tariffs': return <Tariffs />;
+      case 'users': return <UsersPage />;
       case 'settings': return <SettingsPage />;
       default: return <Dashboard />;
     }

@@ -91,9 +91,9 @@ export default function Sources() {
                 <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Тип</th>
                 <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Регион</th>
                 <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Статус</th>
-                <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Интервал</th>
+                <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Траст</th>
+                <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">JS</th>
                 <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Статей</th>
-                <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Последний парсинг</th>
                 <th className="text-right px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Действия</th>
               </tr>
             </thead>
@@ -133,17 +133,25 @@ export default function Sources() {
                       </span>
                     </td>
                     <td className="px-5 py-4">
-                      <span className="text-sm text-slate-600">каждые {source.parseInterval} мин</span>
+                      <div className="flex items-center gap-1.5">
+                        <div className="w-10 bg-slate-200 rounded-full h-1.5">
+                          <div className={`h-1.5 rounded-full ${
+                            source.trustScore >= 85 ? 'bg-emerald-500' :
+                            source.trustScore >= 70 ? 'bg-blue-500' : 'bg-amber-500'
+                          }`} style={{ width: `${source.trustScore}%` }}></div>
+                        </div>
+                        <span className="text-xs font-medium text-slate-600">{source.trustScore}</span>
+                      </div>
+                    </td>
+                    <td className="px-5 py-4">
+                      {source.jsRendering ? (
+                        <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full font-medium">JS ✓</span>
+                      ) : (
+                        <span className="text-xs text-slate-400">—</span>
+                      )}
                     </td>
                     <td className="px-5 py-4">
                       <span className="text-sm font-medium text-slate-800">{source.articlesCount.toLocaleString()}</span>
-                    </td>
-                    <td className="px-5 py-4">
-                      <span className="text-xs text-slate-500">
-                        {new Date(source.lastParsed).toLocaleString('ru-RU', { 
-                          day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' 
-                        })}
-                      </span>
                     </td>
                     <td className="px-5 py-4">
                       <div className="flex items-center justify-end gap-1">

@@ -6,25 +6,31 @@ import {
   FileText, 
   AlertTriangle,
   Clock,
-  ArrowUpRight
+  ArrowUpRight,
+  Brain,
+  Sparkles,
+  Zap,
+  MapPin,
+  Users
 } from 'lucide-react';
 import { 
   LineChart, Line, AreaChart, Area, BarChart, Bar, 
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell
 } from 'recharts';
-import { mockArticles, mockSources, mockAnalyticsData, mockCategoryData } from '../data/mockData';
+import { mockArticles, mockSources, mockAnalyticsData, mockCategoryData, mockNotifications } from '../data/mockData';
 
 export default function Dashboard() {
   const totalArticles = mockSources.reduce((acc, s) => acc + s.articlesCount, 0);
   const activeSources = mockSources.filter(s => s.isActive).length;
   const recentArticles = mockArticles.slice(0, 5);
   const errorSources = mockSources.filter(s => s.status === 'error').length;
+  const aiDiscovered = mockSources.filter(s => s.aiDiscovered).length;
 
   const stats = [
     { label: 'Всего статей', value: totalArticles.toLocaleString(), change: '+12%', trend: 'up', icon: FileText, color: 'blue' },
-    { label: 'Активных источников', value: activeSources, change: '+1', trend: 'up', icon: Database, color: 'green' },
-    { label: 'За последние 24ч', value: '167', change: '+23%', trend: 'up', icon: Activity, color: 'purple' },
+    { label: 'Активных источников', value: activeSources, change: '+2', trend: 'up', icon: Database, color: 'green' },
+    { label: 'AI-обнаружено', value: aiDiscovered, change: 'нов.', trend: 'up', icon: Brain, color: 'purple' },
     { label: 'Ошибки парсинга', value: errorSources, change: '-1', trend: 'down', icon: AlertTriangle, color: 'red' },
   ];
 
@@ -40,11 +46,17 @@ export default function Dashboard() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-800">Дашборд</h1>
-          <p className="text-slate-500 text-sm mt-1">Обзор региональных медиа-ресурсов</p>
+          <p className="text-slate-500 text-sm mt-1">Обзор региональных медиа-ресурсов и аналитики</p>
         </div>
-        <div className="flex items-center gap-2 text-sm text-slate-500">
-          <Clock className="w-4 h-4" />
-          Обновлено: {new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-50 border border-emerald-200 rounded-lg">
+            <Zap className="w-3.5 h-3.5 text-emerald-600" />
+            <span className="text-xs font-medium text-emerald-700">Система активна</span>
+          </div>
+          <div className="flex items-center gap-2 text-sm text-slate-500">
+            <Clock className="w-4 h-4" />
+            {new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}
+          </div>
         </div>
       </div>
 
@@ -80,7 +92,13 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Activity Chart */}
         <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200 p-5">
-          <h3 className="font-semibold text-slate-800 mb-4">Активность парсинга</h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-semibold text-slate-800">Активность парсинга</h3>
+            <div className="flex items-center gap-3 text-xs">
+              <span className="flex items-center gap-1"><span className="w-2 h-2 bg-blue-500 rounded-full"></span> Статьи</span>
+              <span className="flex items-center gap-1"><span className="w-2 h-2 bg-purple-500 rounded-full"></span> Упоминания</span>
+            </div>
+          </div>
           <ResponsiveContainer width="100%" height={250}>
             <AreaChart data={mockAnalyticsData}>
               <defs>
@@ -123,11 +141,12 @@ export default function Dashboard() {
               <Tooltip contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0' }} />
             </PieChart>
           </ResponsiveContainer>
-          <div className="grid grid-cols-2 gap-1 mt-2">
+          <div className="grid grid-cols-2 gap-1.5 mt-2">
             {mockCategoryData.slice(0, 6).map((cat, i) => (
               <div key={i} className="flex items-center gap-1.5 text-xs">
                 <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: cat.color }}></div>
                 <span className="text-slate-600 truncate">{cat.name}</span>
+                <span className="text-slate-400 ml-auto">{cat.value}</span>
               </div>
             ))}
           </div>
@@ -154,9 +173,17 @@ export default function Dashboard() {
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-slate-800 truncate">{article.title}</p>
                   <div className="flex items-center gap-2 mt-1">
-                    <span className="text-xs text-slate-400">{article.sourceName}</span>
+                    <span className="text-xs text-slate-400 flex items-center gap-0.5">
+                      <MapPin className="w-3 h-3" /> {article.region}
+                    </span>
                     <span className="text-xs text-slate-300">•</span>
-                    <span className="text-xs text-slate-400">{article.region}</span>
+                    <span className="text-xs text-slate-400">{article.sourceName}</span>
+                    {article.entities.length > 0 && (
+                      <>
+                        <span className="text-xs text-slate-300">•</span>
+                        <span className="text-xs text-purple-500">{article.entities.length} сущностей</span>
+                      </>
+                    )}
                   </div>
                 </div>
                 <span className="text-xs text-slate-400 flex-shrink-0">
@@ -185,12 +212,24 @@ export default function Dashboard() {
                   {source.type === 'rss' ? 'RSS' : source.type === 'telegram' ? 'TG' : source.type === 'api' ? 'API' : 'WEB'}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-slate-800 truncate">{source.name}</p>
+                  <div className="flex items-center gap-1.5">
+                    <p className="text-sm font-medium text-slate-800 truncate">{source.name}</p>
+                    {source.aiDiscovered && (
+                      <Sparkles className="w-3 h-3 text-purple-500 flex-shrink-0" />
+                    )}
+                  </div>
                   <p className="text-xs text-slate-400">{source.region}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-medium text-slate-700">{source.articlesCount}</p>
-                  <p className="text-xs text-slate-400">статей</p>
+                  <div className="flex items-center gap-1">
+                    <div className="w-12 bg-slate-200 rounded-full h-1.5">
+                      <div className={`h-1.5 rounded-full ${
+                        source.trustScore >= 85 ? 'bg-emerald-500' :
+                        source.trustScore >= 70 ? 'bg-blue-500' : 'bg-amber-500'
+                      }`} style={{ width: `${source.trustScore}%` }}></div>
+                    </div>
+                    <span className="text-xs text-slate-500">{source.trustScore}</span>
+                  </div>
                 </div>
               </div>
             ))}
@@ -213,6 +252,43 @@ export default function Dashboard() {
             <Bar dataKey="mentions" fill="#8b5cf6" radius={[4, 4, 0, 0]} name="Упоминания" />
           </BarChart>
         </ResponsiveContainer>
+      </div>
+
+      {/* Quick Stats Row */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-5">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+              <Brain className="w-5 h-5 text-blue-600" />
+            </div>
+            <div>
+              <p className="text-xs text-blue-600 font-medium">NER-сущностей</p>
+              <p className="text-xl font-bold text-blue-800">1,247</p>
+            </div>
+          </div>
+        </div>
+        <div className="bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-200 rounded-xl p-5">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
+              <Users className="w-5 h-5 text-emerald-600" />
+            </div>
+            <div>
+              <p className="text-xs text-emerald-600 font-medium">Активных пользователей</p>
+              <p className="text-xl font-bold text-emerald-800">5</p>
+            </div>
+          </div>
+        </div>
+        <div className="bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200 rounded-xl p-5">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+              <Activity className="w-5 h-5 text-purple-600" />
+            </div>
+            <div>
+              <p className="text-xs text-purple-600 font-medium">WebSocket подключений</p>
+              <p className="text-xl font-bold text-purple-800">3</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
