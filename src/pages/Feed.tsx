@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type Dispatch, type SetStateAction } from 'react';
 import { 
   Filter, 
   Bookmark, 
@@ -47,7 +47,7 @@ export default function Feed() {
     setArticles(articles.map(a => a.id === id ? { ...a, isBookmarked: !a.isBookmarked } : a));
   };
 
-  const toggleFilter = (arr: string[], setArr: React.Dispatch<React.SetStateAction<string[]>>, value: string) => {
+  const toggleFilter = (arr: string[], setArr: Dispatch<SetStateAction<string[]>>, value: string) => {
     if (arr.includes(value)) {
       setArr(arr.filter(v => v !== value));
     } else {

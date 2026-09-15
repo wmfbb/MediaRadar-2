@@ -92,6 +92,15 @@
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
+    <script>
+      // Диагностика React
+      window.addEventListener('error', function(event) {
+        if (event.message && event.message.includes('useRef')) {
+          console.error('React useRef error detected:', event.message);
+          console.error('Stack:', event.error?.stack);
+        }
+      });
+    </script>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
